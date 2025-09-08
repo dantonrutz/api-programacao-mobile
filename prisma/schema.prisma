@@ -20,6 +20,15 @@ model User {
   email                          String                         @unique
   name                           String
   image                          String?                        
+  roles                          RoleEnum[]                     @default([STUDENT])    
   createdAt                      DateTime                       @default(now())
   updatedAt                      DateTime                       @updatedAt
+}
+
+// Enum das funções dos usuários
+enum RoleEnum {
+  ADMIN
+  COORDINATOR
+  TEACHER
+  STUDENT
 }
