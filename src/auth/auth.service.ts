@@ -10,7 +10,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async signIn(email: string, @Res() res) {
     const user = await this.prisma.user.findUnique({
@@ -43,7 +43,7 @@ export class AuthService {
         data: {
           name: dto.name,
           email: dto.email,
-          image: dto.image.replace('s96-c', 's384-c'),
+          // image: dto.image.replace('s96-c', 's384-c'),
         },
       })
 

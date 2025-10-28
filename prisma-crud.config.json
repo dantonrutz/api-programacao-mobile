@@ -1,0 +1,31 @@
+{
+    "$schema": "https://unpkg.com/@velopays/prisma-crud-generator/schema.json",
+    "generator": {
+        "output": "src/generated",
+        "language": "ts",
+        "useSwagger": true,
+        "useValidation": true,
+        "useGuards": false,
+        "useInterceptors": false
+    },
+    "controllers": {
+        "generate": true,
+        "path": "controllers",
+        "namePattern": "{model}.controller.ts"
+    },
+    "services": {
+        "generate": true,
+        "path": "services",
+        "namePattern": "{model}.service.ts"
+    },
+    "dto": {
+        "generate": true,
+        "path": "dto",
+        "namePattern": "{model}-{action}.dto.ts"
+    },
+    "modules": {
+        "generate": true,
+        "path": "modules",
+        "namePattern": "{model}.module.ts"
+    }
+}

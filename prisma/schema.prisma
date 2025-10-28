@@ -14,21 +14,106 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tabela dos usuários
-model User {
-  id                             String                         @id @default(cuid())
-  email                          String                         @unique
-  name                           String
-  image                          String?                        
-  roles                          RoleEnum[]                     @default([STUDENT])    
-  createdAt                      DateTime                       @default(now())
-  updatedAt                      DateTime                       @updatedAt
-}
-
 // Enum das funções dos usuários
 enum RoleEnum {
   ADMIN
   COORDINATOR
   TEACHER
   STUDENT
+}
+
+model User {
+  id        String      @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  classrooms    Classroom[]    @relation("ClassroomStudents") // turmas onde o user é aluno
+  teaching      Classroom[]    @relation("ClassroomTeacher") // turmas que o user criou como professor
+  exercises     Exercise[]     @relation("UserExercises")
+  roles         RoleEnum[]     @default([STUDENT])
+  answers       Answer[]
+  progress      Progress[]
+  rankings      Ranking[]
+  notifications Notification[]
+}
+
+model Classroom {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique // código de convite
+  createdAt DateTime @default(now())
+
+  // Relações
+  teacherId String
+  teacher   User   @relation("ClassroomTeacher", fields: [teacherId], references: [id])
+  students  User[] @relation("ClassroomStudents")
+
+  exercises Exercise[]
+  rankings  Ranking[]
+}
+
+model Exercise {
+  id        Int      @id @default(autoincrement())
+  question  String
+  options   String[] // alternativas possíveis
+  answer    String // resposta correta
+  theme     String // ex: adição, subtração
+  createdAt DateTime @default(now())
+
+  authorId String
+  author   User @relation("UserExercises", fields: [authorId], references: [id])
+
+  classroomId Int?
+  classroom   Classroom? @relation(fields: [classroomId], references: [id])
+
+  answers Answer[]
+}
+
+model Answer {
+  id        Int      @id @default(autoincrement())
+  selected  String
+  correct   Boolean
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  exerciseId Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+}
+
+model Progress {
+  id        Int      @id @default(autoincrement())
+  xp        Int      @default(0)
+  streak    Int      @default(0) // dias seguidos
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Ranking {
+  id       Int @id @default(autoincrement())
+  position Int
+  score    Int @default(0)
+
+  classroomId Int
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  type      String // ex: turma, ranking, sistema
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
 }
