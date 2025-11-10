@@ -13,17 +13,17 @@ export class ProgressService {
 
     async findAll() { return this.prisma.progress.findMany({ include: { user: true } }); }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const p = await this.prisma.progress.findUnique({ where: { id }, include: { user: true } });
         if (!p) throw new NotFoundException('Progress not found');
         return p;
     }
 
-    async update(id: number, dto: UpdateProgressDto) {
+    async update(id: string, dto: UpdateProgressDto) {
         return this.prisma.progress.update({ where: { id }, data: dto, include: { user: true } });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         await this.findOne(id);
         return this.prisma.progress.delete({ where: { id } });
     }

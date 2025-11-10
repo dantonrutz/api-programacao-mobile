@@ -27,7 +27,7 @@ export class ExerciseService {
         return this.prisma.exercise.findMany({ include: { author: true, classroom: true, answers: true } });
     }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const ex = await this.prisma.exercise.findUnique({
             where: { id },
             include: { author: true, classroom: true, answers: true },
@@ -36,7 +36,7 @@ export class ExerciseService {
         return ex;
     }
 
-    async update(id: number, dto: UpdateExerciseDto) {
+    async update(id: string, dto: UpdateExerciseDto) {
         const data: any = { ...dto };
         return this.prisma.exercise.update({
             where: { id },
@@ -45,7 +45,7 @@ export class ExerciseService {
         });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         await this.findOne(id);
         return this.prisma.exercise.delete({ where: { id } });
     }

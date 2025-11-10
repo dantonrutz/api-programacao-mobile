@@ -11,6 +11,6 @@ export class CreateAnswerDto {
     @IsString()
     userId: string;
 
-    @IsInt()
-    exerciseId: number;
+    @IsString()
+    exerciseId: string;
 }

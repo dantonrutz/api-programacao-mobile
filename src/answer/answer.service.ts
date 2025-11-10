@@ -23,17 +23,17 @@ export class AnswerService {
         return this.prisma.answer.findMany({ include: { user: true, exercise: true } });
     }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const a = await this.prisma.answer.findUnique({ where: { id }, include: { user: true, exercise: true } });
         if (!a) throw new NotFoundException('Answer not found');
         return a;
     }
 
-    async update(id: number, dto: UpdateAnswerDto) {
+    async update(id: string, dto: UpdateAnswerDto) {
         return this.prisma.answer.update({ where: { id }, data: dto, include: { user: true, exercise: true } });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         await this.findOne(id);
         return this.prisma.answer.delete({ where: { id } });
     }

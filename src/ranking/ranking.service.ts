@@ -13,17 +13,17 @@ export class RankingService {
 
     async findAll() { return this.prisma.ranking.findMany({ include: { classroom: true, user: true } }); }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const r = await this.prisma.ranking.findUnique({ where: { id }, include: { classroom: true, user: true } });
         if (!r) throw new NotFoundException('Ranking not found');
         return r;
     }
 
-    async update(id: number, dto: UpdateRankingDto) {
+    async update(id: string, dto: UpdateRankingDto) {
         return this.prisma.ranking.update({ where: { id }, data: dto, include: { classroom: true, user: true } });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         await this.findOne(id);
         return this.prisma.ranking.delete({ where: { id } });
     }

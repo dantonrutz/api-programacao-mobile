@@ -27,7 +27,7 @@ export class ClassroomService {
         return this.prisma.classroom.findMany({ include: { teacher: true, students: true, exercises: true, rankings: true } });
     }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const classroom = await this.prisma.classroom.findUnique({
             where: { id },
             include: { teacher: true, students: true, exercises: true, rankings: true },
@@ -36,7 +36,7 @@ export class ClassroomService {
         return classroom;
     }
 
-    async update(id: number, dto: UpdateClassroomDto) {
+    async update(id: string, dto: UpdateClassroomDto) {
         const data: any = {};
         if (dto.name !== undefined) data.name = dto.name;
         if (dto.code !== undefined) data.code = dto.code;
@@ -52,7 +52,7 @@ export class ClassroomService {
         });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         await this.findOne(id);
         return this.prisma.classroom.delete({ where: { id } });
     }

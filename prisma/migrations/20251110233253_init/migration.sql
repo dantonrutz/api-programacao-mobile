@@ -1,101 +1,99 @@
-/*
-  Warnings:
-
-  - The primary key for the `User` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `image` on the `User` table. All the data in the column will be lost.
-  - The `id` column on the `User` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-  - Added the required column `password` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('COORDINATOR', 'STUDENT', 'TEACHER', 'ADMIN');
+CREATE TYPE "public"."RoleEnum" AS ENUM ('ADMIN', 'COORDINATOR', 'TEACHER', 'STUDENT');
 
--- AlterTable
-ALTER TABLE "public"."User" DROP CONSTRAINT "User_pkey",
-DROP COLUMN "image",
-ADD COLUMN     "password" TEXT NOT NULL,
-ADD COLUMN     "role" "public"."Role" NOT NULL DEFAULT 'STUDENT',
-DROP COLUMN "id",
-ADD COLUMN     "id" SERIAL NOT NULL,
-ADD CONSTRAINT "User_pkey" PRIMARY KEY ("id");
+-- CreateTable
+CREATE TABLE "public"."User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "roles" "public"."RoleEnum"[],
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "public"."Classroom" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "teacherId" INTEGER NOT NULL,
+    "teacherId" TEXT NOT NULL,
 
     CONSTRAINT "Classroom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Exercise" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "question" TEXT NOT NULL,
     "options" TEXT[],
     "answer" TEXT NOT NULL,
     "theme" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "authorId" INTEGER NOT NULL,
-    "classroomId" INTEGER,
+    "authorId" TEXT NOT NULL,
+    "classroomId" TEXT,
 
     CONSTRAINT "Exercise_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Answer" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "selected" TEXT NOT NULL,
     "correct" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "userId" INTEGER NOT NULL,
-    "exerciseId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+    "exerciseId" TEXT NOT NULL,
 
     CONSTRAINT "Answer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Progress" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "xp" INTEGER NOT NULL DEFAULT 0,
     "streak" INTEGER NOT NULL DEFAULT 0,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Progress_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Ranking" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "position" INTEGER NOT NULL,
     "score" INTEGER NOT NULL DEFAULT 0,
-    "classroomId" INTEGER NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "classroomId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Ranking_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Notification" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "message" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "public"."_ClassroomStudents" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
 
     CONSTRAINT "_ClassroomStudents_AB_pkey" PRIMARY KEY ("A","B")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Classroom_code_key" ON "public"."Classroom"("code");

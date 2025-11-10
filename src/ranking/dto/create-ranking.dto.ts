@@ -7,8 +7,8 @@ export class CreateRankingDto {
     @IsInt()
     score?: number;
 
-    @IsInt()
-    classroomId: number;
+    @IsString()
+    classroomId: string;
 
     @IsString()
     userId: string;

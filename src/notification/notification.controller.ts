@@ -1,24 +1,34 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 
 @Controller('notification')
 export class NotificationController {
-    constructor(private readonly service: NotificationService) { }
+  constructor(private readonly service: NotificationService) {}
 
-    @Post()
-    create(@Body() dto: CreateNotificationDto) { return this.service.create(dto); }
+  @Post()
+  create(@Body() dto: CreateNotificationDto) {
+    return this.service.create(dto);
+  }
 
-    @Get()
-    findAll() { return this.service.findAll(); }
+  @Get()
+  findAll() {
+    return this.service.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.service.findOne(id); }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(id);
+  }
 
-    @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateNotificationDto) { return this.service.update(id, dto); }
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateNotificationDto) {
+    return this.service.update(id, dto);
+  }
 
-    @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.service.remove(id); }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.service.remove(id);
+  }
 }
