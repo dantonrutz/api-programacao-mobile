@@ -1,22 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class GoogleSignInDTO {
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty({
-    example: 'danton.rutz@colegioteutonia.com.br',
-  })
-  email: string
-
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: 'Danton Yuri Rutz',
+    example: 'exemplo_de_token',
   })
-  name: string
-
-  @IsString()
-  @IsNotEmpty()
-  image: string
+  access_token: string;
 }

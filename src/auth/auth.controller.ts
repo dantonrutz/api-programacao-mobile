@@ -1,20 +1,14 @@
-import { Controller, Get, Res, UseGuards } from '@nestjs/common'
-import { AuthService } from './auth.service'
-import { GoogleOAuthGuard } from './guard/google-oauth.guard'
-import { GetUser } from './decorator'
-import { User } from 'generated/prisma'
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { GoogleSignInDTO } from './dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(GoogleOAuthGuard)
-  @Get('google/login')
-  googleLogin() {}
-
-  @UseGuards(GoogleOAuthGuard)
-  @Get('google/callback')
-  googleCallback(@GetUser() user: User, @Res() res) {
-    return this.authService.signIn(user.email, res)
+  // Endpoint para login via Google (React Native envia access token)
+  @Post('google')
+  async googleLogin(@Body() dto: GoogleSignInDTO) {
+    return this.authService.validateGoogleUser(dto);
   }
 }
