@@ -11,13 +11,15 @@ import { RoleEnum } from '@prisma/client';
 export class UserService {
   constructor(private prisma: PrismaService) { }
 
-  async getUserPartialProfile(user: User) {
+  async getUserProfile(user: User) {
     return {
       name: user.name,
       email: user.email,
+      image: user.image,
       roles: user.roles,
     }
   }
+  
   private omitPassword(user: any) {
     if (!user) return user;
     const { password, ...rest } = user;

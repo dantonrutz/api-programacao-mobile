@@ -5,7 +5,21 @@ export class GoogleSignInDTO {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    example: 'exemplo_de_token',
+    example: 'email',
   })
-  access_token: string;
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'nome_do_usuario',
+  })
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'url_da_imagem_do_perfil',
+  })
+  image: string;
 }

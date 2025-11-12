@@ -13,10 +13,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private userService: UserService) { }
 
-  @Get('partial-profile')
+  @Get('me')
   @Roles('ADMIN', 'COORDINATOR', 'TEACHER', 'STUDENT')
-  getUserPartialProfile(@GetUser() user: User) {
-    return this.userService.getUserPartialProfile(user)
+  getUserProfile(@GetUser() user: User) {
+    return this.userService.getUserProfile(user)
   }
 
   @Get('rota-de-admin')

@@ -2,7 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { GoogleSignInDTO } from './dto';
+import { GoogleSignInDTO, CredentialsSignInDTO, CredentialsSignUpDTO } from './dto';
+import * as bcrypt from 'bcrypt';
+import { RoleEnum } from 'generated/prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -10,23 +12,24 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
-  // Gera JWT
-  async signToken(userId: string, email: string, roles: string[]) {
-    const payload = { id: userId, email, roles };
-    const secret = this.config.get('JWT_SECRET');
+  // Login com email e senha
+  async credentialsSignIn(dto: CredentialsSignInDTO) {
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (!user) throw new UnauthorizedException('Usuário não encontrado');
 
-    return this.jwt.signAsync(payload, {
-      secret,
-      expiresIn: '6h',
-    });
+    const isValid = await bcrypt.compare(dto.password, user.password);
+    if (!isValid) throw new UnauthorizedException('Senha incorreta');
+
+    const accessToken = await this.signToken(user.id, user.email, user.roles || []);
+
+    return { user, accessToken };
   }
 
-  // Validar token do Google e criar/atualizar usuário
   async validateGoogleUser(dto: GoogleSignInDTO) {
     const googleRes = await fetch(
-      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${dto.access_token}`
+      `https://www.googleapis.com/oauth2/v3/userinfo?access_token=`
     );
     const profile = await googleRes.json();
 
@@ -42,6 +45,7 @@ export class AuthService {
           email: profile.email,
           name: profile.name,
           image: profile.picture,
+          password: '',
         },
       });
     } else {
@@ -59,10 +63,40 @@ export class AuthService {
     return { user, accessToken };
   }
 
-  // Login normal (opcional)
+  // Login com Google
   async signIn(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new UnauthorizedException('Usuário não encontrado');
+
+    const accessToken = await this.signToken(user.id, user.email, user.roles || []);
+
+    return { user, accessToken };
+  }
+
+  async signToken(userId: string, email: string, roles: string[]) {
+    const payload = { id: userId, email, roles };
+    const secret = this.config.get('JWT_SECRET');
+
+    return this.jwt.signAsync(payload, {
+      secret,
+      expiresIn: '6h',
+    });
+  }
+
+  async signUp(dto: CredentialsSignUpDTO) {
+    const existingUser = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (existingUser) throw new UnauthorizedException('Escolha outro e-mail');
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        name: dto.name,
+        image: '',
+        password: hashedPassword,
+        roles: [RoleEnum.STUDENT],
+      },
+    });
 
     const accessToken = await this.signToken(user.id, user.email, user.roles || []);
 

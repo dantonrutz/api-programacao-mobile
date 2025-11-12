@@ -3,10 +3,24 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
 import { UpdateClassroomDto } from './dto/update-classroom.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ClassroomService {
     constructor(private prisma: PrismaService) { }
+
+    async getUserClassroom(user: User) {
+        const studentClassrooms = await this.prisma.classroom.findMany({
+            where: {
+                students: {
+                    some: { id: user.id },
+                },
+            },
+        });
+
+        return studentClassrooms
+    }
+
 
     async create(dto: CreateClassroomDto) {
         const data: any = {
