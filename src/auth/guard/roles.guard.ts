@@ -1,23 +1,26 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
-import { RoleEnum, User } from 'generated/prisma'
-import { rolesKey } from '../decorator'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
+
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<RoleEnum[]>(
-      rolesKey,
-      [context.getHandler(), context.getClass()],
-    )
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    const user: User = context.switchToHttp().getRequest().user
+    // Se não houver roles definidos, permite a rota
+    if (!requiredRoles || requiredRoles.length === 0) return true;
 
-    const hasRequiredRoles = requiredRoles.some((role) =>
-      user.roles.includes(role),
-    )
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    if (!user) return false;
 
-    return hasRequiredRoles
+    // Normaliza roles do usuário para array
+    const userRoles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
+
+    return requiredRoles.some((role) => userRoles.includes(role));
   }
 }
