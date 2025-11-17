@@ -9,6 +9,7 @@ export class ExerciseService {
     constructor(private prisma: PrismaService) { }
 
     async create(dto: CreateExerciseDto) {
+        console.log(dto);
         const data: any = {
             question: dto.question,
             options: dto.options,
@@ -37,6 +38,7 @@ export class ExerciseService {
     }
 
     async update(id: string, dto: UpdateExerciseDto) {
+        console.log(dto);
         const data: any = { ...dto };
         return this.prisma.exercise.update({
             where: { id },

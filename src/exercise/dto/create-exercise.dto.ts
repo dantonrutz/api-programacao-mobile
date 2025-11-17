@@ -17,6 +17,6 @@ export class CreateExerciseDto {
     @IsString() @IsNotEmpty()
     authorId: string;
 
-    @IsOptional()
-    classroomId?: number;
+    @IsString() @IsOptional()
+    classroomId?: string;
 }
